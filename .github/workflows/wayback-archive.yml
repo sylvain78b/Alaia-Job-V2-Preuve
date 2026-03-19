@@ -2,7 +2,7 @@ name: Wayback Machine Daily Archive
 
 on:
   schedule:
-    - cron: '47 15 * * *'   # Tous les jours à 7h00 UTC
+    - cron: '0 8 * * *'   # Tous les jours à 7h00 UTC
   workflow_dispatch:       # Déclenchement manuel possible
 
 jobs:
