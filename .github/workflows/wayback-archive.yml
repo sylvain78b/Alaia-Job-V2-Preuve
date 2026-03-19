@@ -1,0 +1,31 @@
+name: Wayback Machine Daily Archive
+
+on:
+  schedule:
+    - cron: '47 15 * * *'   # Tous les jours à 7h00 UTC
+  workflow_dispatch:       # Déclenchement manuel possible
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Envoyer l'URL à la Wayback Machine
+        run: |
+          URL_TO_ARCHIVE="${{ secrets.URL_TO_ARCHIVE }}"
+
+          echo "📦 Archivage de : $URL_TO_ARCHIVE"
+
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "https://web.archive.org/save/$URL_TO_ARCHIVE" \
+            -H "Accept: application/json" \
+            -H "Authorization: LOW ${{ secrets.WAYBACK_ACCESS_KEY }}:${{ secrets.WAYBACK_SECRET_KEY }}")
+
+          echo "Code HTTP retourné : $RESPONSE"
+
+          if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 302 ]; then
+            echo "✅ Page archivée avec succès."
+          else
+            echo "❌ Échec de l'archivage (code $RESPONSE)."
+            exit 1
+          fi
